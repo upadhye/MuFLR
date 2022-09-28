@@ -1,0 +1,3 @@
+#!/bin/bash
+(time ./MuFLR ./params_MuFLR.dat) >& nu05_Ntau20_Nmu20.txt
+
