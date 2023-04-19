@@ -1,0 +1,41 @@
+#perturbation parameters
+N_TAU = 20
+N_MU  = 20
+N_K   = 256
+
+#file to plot: MuFLR output with print option 3
+MuFLR = "nu05_Ntau20_Nmu20.txt"
+F(I) = sprintf("< head -%i %s | tail -%i", (I+1)*N_K, MuFLR, N_K)
+I0 = 1
+alpha0 = 0
+
+#functions to plot: t ranges from 0 to N_tau-1 and j from 0 to N_MU-1;
+#f from 0 to 1 for psi_cb_lin and psi_nu, and from 0 to 2 for psi_cb
+psi_nu(t,f,j) = column(2 + (2*t+f)*N_MU + j)
+psi_cb_lin(f) = column(2 + 2*N_TAU*N_MU + f)
+psi_cb(f)     = column(2 + 2*N_TAU*N_MU + 2 + f)
+I_cb(u)       = column(2 + 2*N_TAU*N_MU + 5 + u)
+D2_nu(t,f,j)  = column(1)**3/(2.0*pi**2) * psi_nu(t,f,j)**2
+D2_nu_all(f)  = column(1)**3/(2.0*pi**2) \
+                * (sum [t=0:N_TAU-1] psi_nu(t,f,0)/N_TAU)**2
+D2_cb_lin(f)  = column(1)**3/(2.0*pi**2) * psi_cb_lin(f)**2
+D2_cb(f)      = column(1)**3/(2.0*pi**2) * psi_cb(f)**2
+
+#plot controls
+set xlabel "wave number k [h/Mpc]"
+set logscale x
+set xrange [1e-2:10]
+
+set ylabel "dimensionless power {/NotoSerif-Symbol D@^2_n}(k)"
+set logscale y
+set ytics 10
+set format y "10^{%T}"
+set yrange [1e-10:]
+
+set key bottom maxrows 4
+
+set terminal postscript eps enhanced color solid size 5,3 "NotoSerif,18'"
+set output "|ps2pdf -dEPSCrop - > D2nu_z0_vary_j.pdf"
+
+#plot
+plot for [j=0:18:3] F(I0) u 1:(D2_nu(alpha0,0,j)) t sprintf("j=%i",j) w l lw 3
